@@ -1,6 +1,6 @@
 # OhTopUp: Automated Subscribe Decoder & Data, Airtime and Electricity Purchase
 
-This project is a React application used basically for automated transaction of airtime, data, electricity purchase alongside bank transfer. This is a development project and not for production for now which means all transactions you will be able to make with this web app is as a result of fake transactions that wouldn't work in real time. For now, this is a one user webapp which means you use one user's credential to access all features.
+This project is a React application used basically for the automated transaction of airtime, data, electricity purchase alongside bank transfer. This is a development project and not for production for now, which means all transactions you will make with this web app result from fake transactions that wouldn't work in real-time. For now, this is a one user web app which means you use one user's credential to access all features.
 
 ## Languages & Technologies Used
 
