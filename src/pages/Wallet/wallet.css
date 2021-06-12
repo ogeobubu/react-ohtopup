@@ -1,0 +1,25 @@
+.wallet {
+  flex: 4;
+  margin: 1rem;
+}
+
+.walletContainer {
+  background: white;
+  width: 200px;
+  height: 220px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.walletContainer h2 {
+  font-weight: 300;
+}
+
+.walletContainer p {
+  font-size: 30px;
+  margin-top: 1rem;
+  color: green;
+}

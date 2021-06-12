@@ -1,0 +1,27 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  border-top: 0;
+}
+
+body {
+  background: #f4f6fd;
+}
+
+.link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.container {
+  align-items: stretch;
+  display: flex;
+  overflow: hidden;
+  width: 100%;
+  position: relative;
+}
+
+.main-container {
+  display: flex !important;
+}

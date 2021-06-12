@@ -1,0 +1,61 @@
+.airtime {
+  flex: 4;
+  margin: 1rem;
+  background: white;
+  color: #3d4d6a;
+}
+
+.airtimeContainer {
+  padding: 3rem;
+}
+
+.airtimeTitle {
+  font-size: 30px;
+  font-weight: 200;
+  margin-bottom: 1rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.formGroupItems {
+  display: flex;
+  flex-direction: column;
+  margin-top: 1rem;
+}
+
+.formGroupItems > label {
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+  font-size: 17px;
+}
+
+.inputField {
+  border: none;
+  appearance: none;
+  border-bottom: 1px #cccccc solid;
+  padding: 1rem;
+}
+
+.formButton {
+  margin-top: 2rem;
+  background: rgb(49, 49, 158);
+  padding: 1rem;
+  border-radius: 6px;
+  color: #cccccc;
+  border: none;
+  cursor: pointer;
+  appearance: none;
+  font-size: 15px;
+}
+
+.alert {
+  color: red;
+  font-weight: 800;
+}
+
+.bottomAlert {
+  font-size: 13px;
+}

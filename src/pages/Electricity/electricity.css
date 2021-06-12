@@ -1,0 +1,31 @@
+.electricity {
+  flex: 4;
+  margin: 1rem;
+  background-color: white;
+}
+
+.verifyNotification {
+  background: seagreen;
+  color: white;
+  width: 70%;
+  font-size: 14px;
+  padding: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.error {
+  background: rgb(158, 5, 5);
+  color: white;
+  width: 70%;
+  font-size: 14px;
+  padding: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.verifyNotification > p {
+  padding: 1rem 0;
+}
+
+.electricityTable {
+  margin-top: 2rem;
+}
