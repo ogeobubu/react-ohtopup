@@ -1,8 +1,11 @@
 import "./airtime.css";
 import { useEffect, useState } from "react";
-import { TextField } from "@material-ui/core";
+import { TextField, CircularProgress } from "@material-ui/core";
 import MenuItem from "@material-ui/core/MenuItem";
 import axios from "axios";
+import { useSelector } from "react-redux";
+import { useHistory } from "react-router-dom";
+import Notification from "../../utils/Notification";
 
 const network = [
   {
@@ -24,37 +27,56 @@ const network = [
 ];
 
 const Airtime = () => {
-  const [data, setData] = useState({});
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const history = useHistory();
+  const auth = useSelector((state) => state.auth);
+  const token = useSelector((state) => state.token);
+  const { user, isLogged } = auth;
+  const [loading, setLoading] = useState(false);
+  const [alert, setAlert] = useState({
+    show: false,
+    message: "",
+    type: "",
+  });
+
   const [serviceID, setServiceID] = useState("");
   const [amount, setAmount] = useState("");
   const [phone, setPhone] = useState("");
   const [wallet, setWallet] = useState("");
+
+  const removeAlert = (show = false, message = "", type = "") => {
+    setAlert({ show, message, type });
+  };
 
   function numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
 
   useEffect(() => {
+    if (!isLogged) {
+      return history.push("/");
+    }
+  }, [isLogged, history]);
+
+  useEffect(() => {
     const getBalance = async () => {
-      const username = "gabrielle.zalan@finemail.org";
-      const password = "gabrielle";
-      const token = Buffer.from(`${username}:${password}`, "utf8").toString(
-        "base64"
-      );
-      const response = await axios.get(
-        "https://sandbox.vtpass.com/api/balance",
-        {
+      const payload = {
+        email: user.email,
+      };
+
+      try {
+        const response = await axios.post("/api/wallet/balance", payload, {
           headers: {
-            Authorization: `Basic ${token}`,
+            Authorization: token,
           },
-        }
-      );
-      setWallet(response.data.contents.balance);
+        });
+
+        setWallet(response.data.message.amount);
+      } catch (error) {
+        console.log(error.response.data.message);
+      }
     };
     getBalance();
-  }, [wallet]);
+  }, [wallet, user.email, token]);
 
   const handleChange = (e) => {
     setServiceID(e.target.value);
@@ -66,138 +88,47 @@ const Airtime = () => {
     const airtimeData = {
       serviceID,
       amount,
-      request_id: Math.floor(Math.random() * 1000000000).toString(),
       phone,
+      email: user.email,
     };
 
-    const username = "gabrielle.zalan@finemail.org";
-    const password = "gabrielle";
-
-    const token = Buffer.from(`${username}:${password}`, "utf8").toString(
-      "base64"
-    );
-
-    console.log(airtimeData);
-
-    const response = await axios.post(
-      "https://sandbox.vtpass.com/api/pay",
-      airtimeData,
-      {
+    try {
+      setLoading(true);
+      const response = await axios.post("/api/pay/airtime", airtimeData, {
         headers: {
-          Authorization: `Basic ${token}`,
+          Authorization: token,
         },
-      }
-    );
-
-    if (response.data.content.error) {
-      setError("Invalid!");
-    }
-
-    console.log(response.data);
-
-    switch (response.data.code) {
-      case "000":
-        console.log(response.data);
-        setData(response.data);
-        setSuccess("Transaction is Successful. Go to your transaction page.");
-        break;
-      case "001":
-        setError("TRANSACTION QUERY");
-        break;
-      case "010":
-        setError("VARIATION CODE DOES NOT EXIST");
-        break;
-      case "011":
-        setError("Invalid Arguments. Kindly Restart The Process");
-        break;
-      case "012":
-        setError("PRODUCT DOES NOT EXIST");
-        break;
-      case "013":
-        setError("BELOW MINIMUM AMOUNT ALLOWED");
-        break;
-      case "014":
-        setError("REQUEST ID ALREADY EXIST. Kindly Restart this Process");
-        break;
-      case "015":
-        setError("INVALID REQUEST ID");
-        break;
-      case "016":
-        setError("Transaction Failed. Kindly Restart The Process");
-        break;
-      case "017":
-        setError("ABOVE MAXIMUM AMOUNT ALLOWED");
-        break;
-      case "018":
-        setError("LOW WALLET BALANCE");
-        break;
-      case "019":
-        setError("LIKELY DUPLICATE TRANSACTION");
-        break;
-      case "021":
-        setError("ACCOUNT LOCKED");
-        break;
-      case "022":
-        setError("ACCOUNT SUSPENDED");
-        break;
-      case "023":
-        setError("API ACCESS NOT ENABLE FOR USER");
-        break;
-      case "024":
-        setError("ACCOUNT INACTIVE");
-        break;
-      case "025":
-        setError("RECIPIENT BANK INVALID");
-        break;
-      case "026":
-        setError("RECIPIENT ACCOUNT COULD NOT BE VERIFIED");
-        break;
-      case "027":
-        setError("IP NOT WHITELISTED, CONTACT SUPPORT");
-        break;
-      case "030":
-        setError("BILLER NOT REACHABLE AT THIS POINT");
-        break;
-      case "031":
-        setError("BELOW MINIMUM QUANTITY ALLOWED");
-        break;
-      case "032":
-        setError("ABOVE MINIMUM QUANTITY ALLOWED");
-        break;
-      case "034":
-        setError("SERVICE SUSPENDED");
-        break;
-      case "035":
-        setError("SERVICE INACTIVE");
-        break;
-      case "083":
-        setError("SYSTEM ERROR");
-        break;
-      case "099":
-        setSuccess("TRANSACTION IS PROCESSING");
-        break;
-      default:
-        return;
+      });
+      setAlert({
+        show: true,
+        message: response.data.message.response_description,
+        type: "success",
+      });
+      setLoading(false);
+    } catch (error) {
+      setLoading(true);
+      setAlert({
+        show: true,
+        message: error.response.data.message,
+        type: "error",
+      });
+      setLoading(false);
     }
   };
   return (
     <div className="airtime">
       <div className="airtimeContainer">
+        {alert.show && <Notification {...alert} removeAlert={removeAlert} />}
         <h3 className="airtimeTitle">Buy Airtime</h3>
-        {error ? (
-          <p className="error">{error}</p>
-        ) : success ? (
-          <p className="verifyNotification">{success}</p>
-        ) : (
-          ""
-        )}
         <form className="formGroup" onSubmit={handleSubmit}>
           <div className="formGroupItems">
             <label>Payment Option</label>
             <input
               type="text"
               className="inputField"
-              placeholder={`Wallet - ₦${numberWithCommas(Math.floor(wallet))}`}
+              placeholder={`Wallet - ₦${
+                wallet ? numberWithCommas(Math.floor(wallet)) : 0
+              }`}
               disabled={true}
             />
           </div>
@@ -219,7 +150,7 @@ const Airtime = () => {
           </div>
           <div className="formGroupItems">
             <label>
-              Airtime Value <span className="alert">(50 -50,000)</span>
+              Airtime Value <span className="alert">(100 -50,000)</span>
             </label>
             <input
               type="text"
@@ -235,25 +166,15 @@ const Airtime = () => {
               type="text"
               className="inputField"
               onChange={(e) => {
-                setPhone(+e.target.value);
+                setPhone(e.target.value);
               }}
             />
             <span className="bottomAlert">
               Enter one mobile number and NOT two! e.g 08123456789
             </span>
           </div>
-          {/* <div className="formGroupItems">
-            <label>Amount</label>
-            <input
-              type="text"
-              className="inputField"
-              onChange={(e) => {
-                setAmount(e.target.value);
-              }}
-            />
-          </div> */}
           <button type="submit" className="formButton">
-            Submit
+            {loading ? <CircularProgress size="1.5rem" /> : "Submit"}
           </button>
         </form>
       </div>

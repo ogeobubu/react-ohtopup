@@ -1,42 +1,65 @@
 import { DataGrid } from "@material-ui/data-grid";
 import "./myTransactions.css";
-import * as React from "react";
+import { useSelector } from "react-redux";
+import { useHistory } from "react-router-dom";
+import { useEffect } from "react";
 
 const columns = [
-  { field: "id", headerName: "ID", width: 100 },
+  { field: "id", headerName: "ID", width: 150 },
   {
-    field: "firstName",
-    headerName: "First name",
+    field: "description",
+    headerName: "Description",
     width: 150,
-    renderCell: (params) => {
-      return <div></div>;
-    },
   },
-  { field: "lastName", headerName: "Last name", width: 150 },
+  { field: "amount", headerName: "Amount", width: 100 },
   {
-    field: "age",
-    headerName: "Age",
-    type: "number",
+    field: "date",
+    headerName: "Date Initiated",
     width: 150,
+  },
+  {
+    field: "status",
+    headerName: "Status",
+    width: 100,
   },
 ];
 
-const rows = [
-  { id: 1, lastName: "Snow", firstName: "Jon", age: 35 },
-  { id: 2, lastName: "Lannister", firstName: "Cersei", age: 42 },
-  { id: 3, lastName: "Lannister", firstName: "Jaime", age: 45 },
-  { id: 4, lastName: "Stark", firstName: "Arya", age: 16 },
-  { id: 5, lastName: "Targaryen", firstName: "Daenerys", age: 66 },
-  { id: 6, lastName: "Melisandre", firstName: "Book", age: 150 },
-  { id: 7, lastName: "Clifford", firstName: "Ferrara", age: 44 },
-  { id: 8, lastName: "Frances", firstName: "Rossini", age: 36 },
-  { id: 9, lastName: "Roxie", firstName: "Harvey", age: 65 },
-];
+function MyTransactions() {
+  const history = useHistory();
+  const auth = useSelector((state) => state.auth);
+  const { isLogged } = auth;
+  const transactions = useSelector((state) => state.transactions);
 
-export default function MyTransactions() {
+  useEffect(() => {
+    if (!isLogged) {
+      return history.push("/");
+    }
+  }, [isLogged, history]);
+
   return (
     <div className="myTransaction">
-      <DataGrid rows={rows} columns={columns} pageSize={5} checkboxSelection />
+      <DataGrid
+        rows={transactions?.map((transaction) => {
+          return {
+            id:
+              transaction.content?.transactions?.transactionId ||
+              transaction._id,
+            description:
+              transaction.content?.transactions?.product_name ||
+              "Wallet Topped",
+            amount:
+              transaction.content?.transactions?.total_amount ||
+              transaction.amount / 100,
+            date: transaction.date,
+            status: transaction.content?.transactions?.status || "topped",
+          };
+        })}
+        columns={columns}
+        pageSize={13}
+        checkboxSelection
+      />
     </div>
   );
 }
+
+export default MyTransactions;

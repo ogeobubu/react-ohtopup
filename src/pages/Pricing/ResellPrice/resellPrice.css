@@ -1,0 +1,97 @@
+.reseller {
+  margin-top: 3rem;
+}
+
+.reseller .about-container {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.resellerHeadingContainer {
+  width: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 1rem auto;
+}
+
+.resellerHeading {
+  text-align: center;
+}
+
+.card {
+  background-color: #fffefe;
+  width: 250px;
+  height: 100%;
+  margin-right: 1rem;
+}
+
+.cardFlex {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.cardTop {
+}
+
+.cardContainer {
+  padding: 1rem;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.mtn {
+  background-color: #f6c504;
+}
+
+.glo {
+  background-color: #03f602;
+}
+
+.nineMobile {
+  background-color: #045c3e;
+}
+
+.airtel {
+  background-color: #f70101;
+}
+
+.cardBody .cardContainer span {
+}
+
+.cardPrice {
+  display: flex;
+  margin: 1rem 0;
+}
+
+.greenTick {
+  color: teal;
+  margin-right: 0.5rem;
+}
+
+@media screen and (max-width: 1033px) {
+  .cardFlex {
+    flex-wrap: wrap;
+    margin-top: 1rem;
+  }
+
+  .card {
+    margin-top: 1rem;
+  }
+}
+
+@media screen and (max-width: 560px) {
+  .cardFlex {
+    flex-direction: column;
+  }
+  .card {
+    width: 100%;
+  }
+
+  .resellerHeadingContainer {
+    width: 100%;
+  }
+}

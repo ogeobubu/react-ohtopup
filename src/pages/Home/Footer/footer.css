@@ -1,0 +1,33 @@
+footer {
+  background-color: #21335a;
+  color: #fff;
+}
+
+footer .about-container {
+  display: flex;
+  padding: 5rem 4rem;
+}
+
+footer .about-container .left {
+  width: 30%;
+}
+
+footer .about-container .aboutRight ul {
+  margin-top: 0.5rem;
+  list-style: none;
+}
+
+footer .about-container .aboutRight li {
+  margin-bottom: 1rem;
+}
+
+@media screen and (max-width: 500px) {
+  footer .about-container {
+    flex-direction: column;
+  }
+
+  footer .about-container .left {
+    width: 100%;
+    margin-bottom: 2rem;
+  }
+}

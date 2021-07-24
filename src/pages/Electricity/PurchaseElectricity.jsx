@@ -1,37 +1,33 @@
-import {
-  TextField,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-} from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { CircularProgress } from "@material-ui/core";
 
-const useStyles = makeStyles({
-  table: {
-    minWidth: 650,
-  },
-});
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import Notification from "../../utils/Notification";
 
 const PurchaseElectricity = ({
   verifyDetails,
   setPhone,
-  setAmount,
   serviceID,
-  amount,
   phone,
   type,
   billersCode,
 }) => {
-  const [transactionResult, setTransactionResult] = useState([]);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const auth = useSelector((state) => state.auth);
+  const token = useSelector((state) => state.token);
+  const { user } = auth;
+  const [amount, setAmount] = useState("");
   const [wallet, setWallet] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const [alert, setAlert] = useState({
+    show: false,
+    message: "",
+    type: "",
+  });
+  const removeAlert = (show = false, message = "", type = "") => {
+    setAlert({ show, message, type });
+  };
 
   function numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -39,161 +35,76 @@ const PurchaseElectricity = ({
 
   useEffect(() => {
     const getBalance = async () => {
-      const username = "gabrielle.zalan@finemail.org";
-      const password = "gabrielle";
-      const token = Buffer.from(`${username}:${password}`, "utf8").toString(
-        "base64"
-      );
-      const response = await axios.get(
-        "https://sandbox.vtpass.com/api/balance",
-        {
+      const payload = {
+        email: user.email,
+      };
+
+      try {
+        const response = await axios.post("/api/wallet/balance", payload, {
           headers: {
-            Authorization: `Basic ${token}`,
+            Authorization: token,
           },
-        }
-      );
-      setWallet(response.data.contents.balance);
+        });
+
+        setWallet(response.data.message.amount);
+      } catch (error) {
+        console.log(error.response.data.message);
+      }
     };
     getBalance();
-  }, [wallet]);
+  }, [wallet, user.email, token]);
 
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
 
       const userElectricPurchase = {
-        request_id: Math.floor(Math.random() * 1000000000).toString(),
         serviceID,
         billersCode,
         variation_code: type,
         amount,
         phone,
-        date: new Date(),
+        email: user.email,
       };
-
-      const username = "gabrielle.zalan@finemail.org";
-      const password = "gabrielle";
-
-      const token = Buffer.from(`${username}:${password}`, "utf8").toString(
-        "base64"
-      );
-
+      setLoading(true);
       const response = await axios.post(
-        "https://sandbox.vtpass.com/api/pay",
+        "/api/pay/electricity",
         userElectricPurchase,
         {
           headers: {
-            Authorization: `Basic ${token}`,
+            Authorization: token,
           },
         }
       );
-      setTransactionResult(response.data);
-
-      switch (response.data.code) {
-        case "000":
-          const JSONData = JSON.stringify(response.data);
-          localStorage.setItem("transaction", JSONData);
-          setSuccess("Transaction is Successful. Go to your transaction page.");
-          break;
-        case "001":
-          setError("TRANSACTION QUERY");
-          break;
-        case "010":
-          setError("VARIATION CODE DOES NOT EXIST");
-          break;
-        case "011":
-          setError("Invalid Arguments. Kindly Restart The Process");
-          break;
-        case "012":
-          setError("PRODUCT DOES NOT EXIST");
-          break;
-        case "013":
-          setError("BELOW MINIMUM AMOUNT ALLOWED");
-          break;
-        case "014":
-          setError("REQUEST ID ALREADY EXIST. Kindly Restart this Process");
-          break;
-        case "015":
-          setError("INVALID REQUEST ID");
-          break;
-        case "016":
-          setError("Transaction Failed. Kindly Restart The Process");
-          break;
-        case "017":
-          setError("ABOVE MAXIMUM AMOUNT ALLOWED");
-          break;
-        case "018":
-          setError("LOW WALLET BALANCE");
-          break;
-        case "019":
-          setError("LIKELY DUPLICATE TRANSACTION");
-          break;
-        case "021":
-          setError("ACCOUNT LOCKED");
-          break;
-        case "022":
-          setError("ACCOUNT SUSPENDED");
-          break;
-        case "023":
-          setError("API ACCESS NOT ENABLE FOR USER");
-          break;
-        case "024":
-          setError("ACCOUNT INACTIVE");
-          break;
-        case "025":
-          setError("RECIPIENT BANK INVALID");
-          break;
-        case "026":
-          setError("RECIPIENT ACCOUNT COULD NOT BE VERIFIED");
-          break;
-        case "027":
-          setError("IP NOT WHITELISTED, CONTACT SUPPORT");
-          break;
-        case "030":
-          setError("BILLER NOT REACHABLE AT THIS POINT");
-          break;
-        case "031":
-          setError("BELOW MINIMUM QUANTITY ALLOWED");
-          break;
-        case "032":
-          setError("ABOVE MINIMUM QUANTITY ALLOWED");
-          break;
-        case "034":
-          setError("SERVICE SUSPENDED");
-          break;
-        case "035":
-          setError("SERVICE INACTIVE");
-          break;
-        case "083":
-          setError("SYSTEM ERROR");
-          break;
-        case "099":
-          setSuccess("TRANSACTION IS PROCESSING");
-          break;
-        default:
-          return;
-      }
+      setAlert({
+        show: true,
+        message: response.data.message.response_description,
+        type: "success",
+      });
+      setLoading(false);
     } catch (error) {
-      console.error(error);
+      setLoading(true);
+      setAlert({
+        show: true,
+        message: error.response.data.message,
+        type: "error",
+      });
+      setLoading(false);
     }
   };
 
   return (
     <>
-      {error ? (
-        <p className="error">{error}</p>
-      ) : success ? (
-        <p className="verifyNotification">{success}</p>
-      ) : (
-        ""
-      )}
       <form className="formGroup" onSubmit={handleSubmit}>
+        {alert.show && <Notification {...alert} removeAlert={removeAlert} />}
         <div className="formGroupItems">
           <label>Payment Option</label>
           <input
             type="text"
             className="inputField"
-            placeholder={`Wallet - ₦${numberWithCommas(Math.floor(wallet))}`}
+            placeholder={`Wallet - ₦${
+              wallet ? numberWithCommas(Math.floor(wallet)) : 0
+            }`}
             disabled={true}
           />
         </div>
@@ -211,11 +122,11 @@ const PurchaseElectricity = ({
         <div className="formGroupItems">
           <label>
             Meter Number and Meter Name:
-            <span className="alert">{verifyDetails.Customer_Name}</span>
+            <span className="alert">{verifyDetails.content.Customer_Name}</span>
           </label>
           <input
             type="text"
-            value={verifyDetails.Meter_Number}
+            value={verifyDetails.content.Meter_Number}
             className="inputField"
             //   onChange={(e) => setBillersCode(e.target.value)}
             disabled={true}
@@ -237,7 +148,9 @@ const PurchaseElectricity = ({
         </div>
 
         <div className="formGroupItems">
-          <label>Amount</label>
+          <label>
+            Amount <span className="alert">(₦500 - ₦5,000)</span>
+          </label>
           <input
             type="text"
             className="inputField"
@@ -248,7 +161,7 @@ const PurchaseElectricity = ({
         </div>
 
         <button type="submit" className="formButton">
-          Pay Now
+          {loading ? <CircularProgress size="1rem" /> : "Pay Now"}
         </button>
       </form>
     </>

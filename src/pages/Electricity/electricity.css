@@ -5,9 +5,9 @@
 }
 
 .verifyNotification {
-  background: seagreen;
+  background: teal;
   color: white;
-  width: 70%;
+  width: 100%;
   font-size: 14px;
   padding: 0.8rem;
   margin-bottom: 1rem;
@@ -16,7 +16,7 @@
 .error {
   background: rgb(158, 5, 5);
   color: white;
-  width: 70%;
+  width: 100%;
   font-size: 14px;
   padding: 0.8rem;
   margin-bottom: 1rem;

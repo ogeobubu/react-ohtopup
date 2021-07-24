@@ -1,0 +1,36 @@
+.adminStats {
+  display: flex;
+}
+
+.adminCard {
+  background-color: white;
+  width: 250px;
+  height: 150px;
+  border-radius: 7px;
+  box-shadow: -2px 2px 5px 0px rgba(0, 0, 0, 0.43);
+  -webkit-box-shadow: -2px 2px 5px 0px rgba(0, 0, 0, 0.43);
+  -moz-box-shadow: -2px 2px 5px 0px rgba(0, 0, 0, 0.43);
+  margin-right: 1rem;
+}
+
+.adminCardItem {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.adminCardContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.adminCardBottom {
+  font-size: 30px;
+}
+
+.usersTable {
+  margin: 3rem 0;
+}

@@ -21,7 +21,8 @@
 
 .tableStyle {
   width: 100%;
-  border-spacing: 20px;
+  /* border-spacing: 20px; */
+  border-spacing: 9px;
 }
 
 .tableTh {
@@ -70,6 +71,26 @@
 .tableButton.Pending {
   background-color: #ebf1fe;
   color: #2a7ade;
+}
+
+.tableStatus.failed {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: tomato;
+  color: white;
+  padding: 2px 2px;
+  border-radius: 5px;
+}
+
+.tableStatus.success {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: teal;
+  color: white;
+  padding: 2px 2px;
+  border-radius: 5px;
 }
 
 @media screen and (max-width: 750px) {

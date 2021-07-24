@@ -1,0 +1,82 @@
+.viewPayment {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.invoice {
+  width: 100%;
+}
+
+.clientPayment {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+  width: 100%;
+}
+
+.status {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  flex-direction: column;
+}
+
+.viewSuccess {
+  background: #28a644;
+  color: white;
+  padding: 0.1rem 0.2rem;
+  border-radius: 5px;
+  font-size: 15px;
+}
+
+.viewFailure {
+  background: rgb(160, 7, 7);
+  color: white;
+  padding: 0.1rem 0.2rem;
+  border-radius: 5px;
+  font-size: 15px;
+}
+
+.descriptionInvoice {
+  margin-top: 3rem;
+}
+
+table.blueTable {
+  border: 1px solid #1c6ea4;
+  background-color: #eeeeee;
+  width: 100%;
+  text-align: left;
+}
+table.blueTable td,
+table.blueTable th {
+  border: 0px solid #aaaaaa;
+  padding: 4px 1px;
+}
+table.blueTable tbody td {
+  font-size: 15px;
+}
+table.blueTable tr:nth-child(even) {
+  background: #d0e4f5;
+}
+table.blueTable thead {
+  border-bottom: 1px solid #444444;
+}
+table.blueTable thead th {
+  font-size: 12px;
+  font-weight: bold;
+  text-align: left;
+}
+table.blueTable tfoot {
+  font-weight: bold;
+}
+
+@media screen and (max-width: 595px) {
+  .viewPayment {
+    flex-direction: column;
+  }
+
+  .clientPayment {
+    flex-direction: column;
+  }
+}

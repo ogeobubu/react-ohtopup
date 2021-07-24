@@ -4,7 +4,6 @@ import {
   SimCard,
   Print,
   DataUsage,
-  ExitToApp,
   AccountCircle,
   People,
   AccountBalance,
@@ -80,11 +79,6 @@ const SidebarData = [
     title: "Profile",
     path: "/dashboard/profile",
     icon: <AccountCircle className="sidebarIcon" />,
-  },
-  {
-    title: "Logout",
-    path: "/logout",
-    icon: <ExitToApp className="sidebarIcon" />,
   },
 ];
 

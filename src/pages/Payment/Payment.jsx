@@ -1,86 +1,138 @@
 import "./payment.css";
-import { PaystackButton } from "react-paystack";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { useSelector } from "react-redux";
+import { useHistory } from "react-router-dom";
+import { CircularProgress } from "@material-ui/core";
+import Notification from "../../utils/Notification";
+
+const charges = (value) => {
+  return Math.ceil((1.5 / 100) * value);
+};
 
 const Payment = () => {
-  const publicKey = "{YOUR PAYSTACK API KEY}";
-  const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
-  const [amount, setAmount] = useState("");
-  const [phone, setPhone] = useState("");
+  const history = useHistory();
+  const [userAmount, setAmount] = useState("");
+  const auth = useSelector((state) => state.auth);
+  const token = useSelector((state) => state.token);
+  const { user, isLogged } = auth;
+  const [wallet, setWallet] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [alert, setAlert] = useState({
+    show: false,
+    message: "",
+    type: "",
+  });
 
-  const nairaToKobo = (x) => {
-    return (x * 1000).toFixed(0);
+  const removeAlert = (show = false, message = "", type = "") => {
+    setAlert({ show, message, type });
   };
 
-  const parseCurrency = (x) => {
-    return new Intl.NumberFormat("en-NG", {
-      style: "currency",
-      currency: "NGN",
-    }).format(x);
-  };
+  useEffect(() => {
+    if (!isLogged) {
+      return history.push("/");
+    }
+  }, [isLogged, history]);
 
-  const vat = (x) => {
-    return 0.075 * x;
-  };
+  useEffect(() => {
+    const getBalance = async () => {
+      const payload = {
+        email: user.email,
+      };
 
-  const total = (x) => {
-    return x + nairaToKobo(amount) + vat(amount);
-  };
+      try {
+        const response = await axios.post("/api/wallet/balance", payload, {
+          headers: {
+            Authorization: token,
+          },
+        });
 
-  console.log(nairaToKobo(amount));
-  nairaToKobo(amount);
+        setWallet(response.data.message.amount);
+      } catch (error) {
+        console.log(error.response.data.message);
+      }
+    };
+    getBalance();
+  }, [wallet, user.email, token]);
 
-  const componentProps = {
-    email,
-    amount,
-    metadata: {
-      name,
-      phone,
-    },
-    publicKey,
-    text: "Pay Now",
-    onSuccess: () =>
-      alert("Thanks for doing business with us! Come back soon!!"),
-    onClose: () => alert("Wait! You need this oil, don't go!!!!"),
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const transactData = {
+      email: user.email,
+      amount: `${userAmount + charges(userAmount)}00`,
+    };
+
+    if (!wallet) {
+      return setAlert({
+        show: true,
+        message: "Activate your wallet to use this feature.",
+        type: "error",
+      });
+    }
+
+    if (userAmount < 500) {
+      return setAlert({
+        show: true,
+        message: "You can only top your wallet from ₦500 and above.",
+        type: "error",
+      });
+    }
+
+    try {
+      setLoading(true);
+      const response = await axios.post(
+        "/api/transaction/initialize",
+        transactData,
+        {
+          headers: {
+            Authorization: token,
+          },
+        }
+      );
+
+      if (
+        response.data.message.data.access_code &&
+        response.data.message.data.authorization_url
+      ) {
+        window.location.replace(
+          `${response.data.message.data.authorization_url}`
+        );
+      }
+      setLoading(false);
+    } catch (error) {
+      setLoading(true);
+      setAlert({
+        show: true,
+        message: error.response.data.message,
+        type: "error",
+      });
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="payment">
-      <div className="checkout-form">
-        <div className="checkout-field">
-          <label>Name</label>
-          <input
-            type="text"
-            id="name"
-            onChange={(e) => setName(e.target.value)}
-          />
-        </div>
-        <div className="checkout-field">
-          <label>Email</label>
-          <input
-            type="text"
-            id="email"
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
-        <div className="checkout-field">
-          <label>Amount</label>
-          <input
-            type="text"
-            id="amount"
-            onChange={(e) => setAmount(+e.target.value)}
-          />
-        </div>
-        <div className="checkout-field">
-          <label>Phone</label>
-          <input
-            type="text"
-            id="phone"
-            onChange={(e) => setPhone(e.target.value)}
-          />
-        </div>
-        <PaystackButton className="paystack-button" {...componentProps} />
+    <div className="airtime">
+      <div className="airtimeContainer">
+        {alert.show && <Notification {...alert} removeAlert={removeAlert} />}
+        <h3 className="airtimeTitle">Deposit Money To Your Wallet</h3>
+        <form className="formGroup" onSubmit={handleSubmit}>
+          <div className="formGroupItems">
+            <label>
+              Amount <span className="alert">(₦500 -₦50,000)</span>
+            </label>
+            <input
+              type="text"
+              className="inputField"
+              onChange={(e) => {
+                setAmount(+e.target.value);
+              }}
+            />
+          </div>
+          <button type="submit" className="formButton">
+            {loading ? <CircularProgress size="1.5rem" /> : "Submit"}
+          </button>
+        </form>
       </div>
     </div>
   );
