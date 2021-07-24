@@ -74,7 +74,7 @@ const Payment = () => {
     if (userAmount < 500) {
       return setAlert({
         show: true,
-        message: "You can only top your wallet from ₦500 and above.",
+        message: "You can only top your wallet from ₦500 and above..",
         type: "error",
       });
     }
